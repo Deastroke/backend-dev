@@ -7,21 +7,22 @@ dotenv.config();
 
 const app = express();
 
-// 🔹 CORS dinámico
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+// 🔹 URL de frontend en producción
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
+// 🔹 Configuración CORS
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || origin === FRONTEND_URL) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS no permitido"));
-    }
-  }
+  origin: FRONTEND_URL, // permite solo tu frontend desplegado
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 
-app.use(express.json());
+// 🔹 Manejar preflight requests
+app.options("*", cors());
 
-// Última actualización de producción - forzando deploy
+// 🔹 Parsear JSON
+app.use(express.json());
 
 // 🔹 Ruta para enviar correo
 app.post("/enviar-correo", async (req, res) => {
@@ -32,6 +33,8 @@ app.post("/enviar-correo", async (req, res) => {
   }
 
   try {
+    console.log("📨 Datos recibidos:", req.body);
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -43,9 +46,9 @@ app.post("/enviar-correo", async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_USER,
-      subject: `Nuevo mensaje de ${nombre}`,
+      subject: `📩 Nuevo mensaje de ${nombre}`,
       text: `
-📩 Nuevo mensaje recibido desde el formulario de contacto
+💌 ¡Tienes un nuevo mensaje desde tu formulario de contacto! 💌
 
 👤 Nombre: ${nombre}
 📞 Teléfono: ${telefono}
@@ -54,7 +57,10 @@ app.post("/enviar-correo", async (req, res) => {
 
 💬 Mensaje:
 ${mensaje}
-      `
+
+----------------------------------------
+📌 Este mensaje fue enviado automáticamente desde tu sitio web.
+`
     };
 
     await transporter.sendMail(mailOptions);
