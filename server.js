@@ -12,14 +12,19 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 
 // 🔹 Configuración CORS
 app.use(cors({
-  origin: FRONTEND_URL, // permite solo tu frontend desplegado
+  origin: FRONTEND_URL, // solo permite tu frontend desplegado
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
 // 🔹 Manejar preflight requests
-app.options("*", cors());
+app.options("*", cors({
+  origin: FRONTEND_URL,
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
+  credentials: true
+}));
 
 // 🔹 Parsear JSON
 app.use(express.json());
@@ -27,14 +32,11 @@ app.use(express.json());
 // 🔹 Ruta para enviar correo
 app.post("/enviar-correo", async (req, res) => {
   const { nombre, telefono, email, servicio, mensaje } = req.body;
-
   if (!nombre || !telefono || !email || !servicio || !mensaje) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
 
   try {
-    console.log("📨 Datos recibidos:", req.body);
-
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -64,7 +66,6 @@ ${mensaje}
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("✅ Correo enviado correctamente");
     res.status(200).json({ ok: true, mensaje: "Correo enviado correctamente" });
   } catch (error) {
     console.error("❌ Error al enviar correo:", error);
@@ -72,6 +73,6 @@ ${mensaje}
   }
 });
 
-// 🔹 Puerto asignado por Render o 5001 por defecto
+// 🔹 Puerto de Render o 5001
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
