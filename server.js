@@ -3,13 +3,17 @@ import cors from "cors";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
-dotenv.config(); // 👈 Carga las variables de entorno
+dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// 🔹 Ajuste CORS para producción
+app.use(cors({
+  origin: ["http://localhost:5173", "https://brayan-dev.onrender.com"]
+}));
+
 app.use(express.json());
 
-// 🔹 Ruta para enviar el correo
 app.post("/enviar-correo", async (req, res) => {
   const { nombre, telefono, email, servicio, mensaje } = req.body;
 
@@ -18,7 +22,6 @@ app.post("/enviar-correo", async (req, res) => {
   }
 
   try {
-    // Configurar transporte con Gmail y contraseña de aplicación
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -27,7 +30,6 @@ app.post("/enviar-correo", async (req, res) => {
       },
     });
 
-    // Contenido del correo
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_USER,
@@ -47,7 +49,6 @@ ${mensaje}
 
     await transporter.sendMail(mailOptions);
     console.log("✅ Correo enviado correctamente");
-
     res.status(200).json({ ok: true, mensaje: "Correo enviado correctamente" });
   } catch (error) {
     console.error("❌ Error al enviar correo:", error);
@@ -55,5 +56,5 @@ ${mensaje}
   }
 });
 
-const PORT = 5001;
-app.listen(PORT, () => console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`));
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
