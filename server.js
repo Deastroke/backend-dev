@@ -21,6 +21,8 @@ app.use(cors({
 
 app.use(express.json());
 
+// Última actualización de producción - forzando deploy
+
 // 🔹 Ruta para enviar correo
 app.post("/enviar-correo", async (req, res) => {
   const { nombre, telefono, email, servicio, mensaje } = req.body;
