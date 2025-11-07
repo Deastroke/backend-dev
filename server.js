@@ -7,13 +7,21 @@ dotenv.config();
 
 const app = express();
 
-// 🔹 Ajuste CORS para producción
+// 🔹 CORS dinámico
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 app.use(cors({
-  origin: ["http://localhost:5173", "https://brayan-dev.onrender.com"]
+  origin: function(origin, callback) {
+    if (!origin || origin === FRONTEND_URL) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS no permitido"));
+    }
+  }
 }));
 
 app.use(express.json());
 
+// 🔹 Ruta para enviar correo
 app.post("/enviar-correo", async (req, res) => {
   const { nombre, telefono, email, servicio, mensaje } = req.body;
 
@@ -44,7 +52,7 @@ app.post("/enviar-correo", async (req, res) => {
 
 💬 Mensaje:
 ${mensaje}
-      `,
+      `
     };
 
     await transporter.sendMail(mailOptions);
@@ -56,5 +64,6 @@ ${mensaje}
   }
 });
 
+// 🔹 Puerto asignado por Render o 5001 por defecto
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
