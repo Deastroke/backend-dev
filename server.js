@@ -1,19 +1,18 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
-import correoRoutes from "./routes/correo.js";
+import cors from "cors";
+import correoRoutes from "./routes/correo.js"; // 👈 asegúrate que la ruta coincida
 
 dotenv.config();
 const app = express();
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  methods: ["GET", "POST"],
-}));
+app.use(cors());
 app.use(express.json());
 
-// Ruta del formulario
-app.use("/api/correo", correoRoutes);
+// Ruta de tu formulario
+app.use("/api", correoRoutes);
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+});
