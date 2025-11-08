@@ -9,6 +9,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/api/test", (req, res) => {
+  res.json({ success: true, message: "Backend funcionando correctamente ✅" });
+});
+
 // Ruta de tu formulario
 app.use("/api", correoRoutes);
 
