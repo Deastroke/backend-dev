@@ -1,32 +1,27 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import correoRoutes from "./routes/correo.js";
+import correoRoutes from "./routes/correo.js"; // 👈 asegúrate que la ruta coincida
 
 dotenv.config();
 const app = express();
 
-// ✅ Permitir solicitudes desde tu frontend en Render
-app.use(
-  cors({
-    origin: ["https://brayan-dev.onrender.com", "http://localhost:5173"],
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
+// Configura CORS para permitir tu frontend
+app.use(cors({
+  origin: "https://brayan-dev.onrender.com", // reemplaza con tu URL de frontend
+  methods: ["GET", "POST"],
+}));
 
-// ✅ Middleware para leer JSON
 app.use(express.json());
 
-// ✅ Ruta de prueba
+// Ruta de prueba
 app.get("/api/test", (req, res) => {
   res.json({ success: true, message: "Backend funcionando correctamente ✅" });
 });
 
-// ✅ Ruta del formulario
+// Ruta de tu formulario
 app.use("/api", correoRoutes);
 
-// ✅ Levantar servidor
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);

@@ -7,6 +7,7 @@ const router = express.Router();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Aquí cambiamos la ruta a /enviar-correo
 router.post("/enviar", async (req, res) => {
   const { nombre, telefono, email, servicio, mensaje } = req.body;
 
